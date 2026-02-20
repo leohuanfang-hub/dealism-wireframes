@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>我 — Dealism</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f0f0f5;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  .phone {
+    width: 375px; height: 812px; background: #f8f8fa;
+    border-radius: 44px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), inset 0 0 0 2px #d1d1d6;
+    position: relative; display: flex; flex-direction: column;
+  }
+  .notch {
+    width: 120px; height: 34px; background: #000; border-radius: 20px;
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10;
+  }
+  .statusbar {
+    height: 54px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 28px 8px; font-size: 14px; font-weight: 600; color: #1a1a1a;
+    flex-shrink: 0; background: #fff;
+  }
+  .statusbar .time { font-size: 15px; font-weight: 700; }
+  .statusbar .icons { font-size: 12px; color: #666; }
+
+  /* Profile header */
+  .profile-header {
+    background: #fff;
+    padding: 16px 20px 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c5bf0, #5b8af0);
+    margin: 0 auto 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: #fff; font-weight: 700;
+  }
+  .profile-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+  .profile-summary {
+    font-size: 14px;
+    color: #888;
+    line-height: 1.5;
+  }
+
+  /* Content */
+  .me-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Settings section */
+  .section-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .section-title {
+    padding: 16px 16px 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+  }
+  .setting-item:last-child { border-bottom: none; }
+  .setting-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .setting-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .setting-icon.gmail { background: #e3f2fd; }
+  .setting-icon.notify { background: #fff3e0; }
+  .setting-icon.agent { background: #f0ebff; }
+  .setting-icon.privacy { background: #e8f5e9; }
+  .setting-icon.help { background: #fce4ec; }
+  .setting-icon.about { background: #f5f5f5; }
+
+  .setting-label {
+    font-size: 15px;
+    color: #1a1a1a;
+  }
+  .setting-badge {
+    font-size: 12px;
+    color: #34c759;
+    font-weight: 500;
+    background: #e8f5e9;
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .setting-arrow {
+    font-size: 16px;
+    color: #ccc;
+  }
+
+  .logout-btn {
+    width: 100%;
+    padding: 14px;
+    text-align: center;
+    font-size: 15px;
+    color: #ff3b30;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* Tab bar — 4 tabs */
+  .tab-bar {
+    display: flex; height: 52px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
+    background: #fff;
+  }
+  .tab-bar a {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-decoration: none; gap: 2px;
+    font-size: 10px; color: #999; font-weight: 500;
+  }
+  .tab-bar a.active { color: #7c5bf0; }
+  .tab-bar a .tab-icon { font-size: 22px; }
+
+  .home-bar {
+    height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    background: #fff;
+  }
+  .home-bar .bar { width: 134px; height: 5px; background: #1a1a1a; border-radius: 3px; }
+
+  .back-link {
+    position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: #fff;
+    text-decoration: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; z-index: 100;
+  }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link">← All Pages</a>
+<div class="phone">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span class="time">10:26</span>
+    <div class="icons">📶 WiFi 🔋</div>
+  </div>
+
+  <div class="profile-header">
+    <div class="avatar">L</div>
+    <div class="profile-name">Leo</div>
+    <div class="profile-summary">你的 AI 助手，已陪伴你 14 天</div>
+  </div>
+
+  <div class="me-content">
+    <!-- Settings section -->
+    <div class="section-card">
+      <div class="section-title">⚙️ 设置</div>
+
+      <div class="setting-item">
+        <div class="setting-left">
+          <div class="setting-icon gmail">📧</div>
+          <span class="setting-label">连接的账号</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="setting-badge">Gmail ✅</span>
+          <span class="setting-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-left">
+          <div class="setting-icon notify">🔔</div>
+          <span class="setting-label">通知设置</span>
+        </div>
+        <span class="setting-arrow">›</span>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-left">
+          <div class="setting-icon agent">🤖</div>
+          <span class="setting-label">Agent 工作偏好</span>
+        </div>
+        <span class="setting-arrow">›</span>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-left">
+          <div class="setting-icon privacy">🔒</div>
+          <span class="setting-label">隐私与数据</span>
+        </div>
+        <span class="setting-arrow">›</span>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-left">
+          <div class="setting-icon help">💬</div>
+          <span class="setting-label">帮助与反馈</span>
+        </div>
+        <span class="setting-arrow">›</span>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-left">
+          <div class="setting-icon about">ℹ️</div>
+          <span class="setting-label">关于</span>
+        </div>
+        <span class="setting-arrow">›</span>
+      </div>
+
+      <div class="logout-btn">退出登录</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <a href="page4-taskflow.html">
+      <span class="tab-icon">📋</span>
+      <span>任务流</span>
+    </a>
+    <a href="page3-chat.html">
+      <span class="tab-icon">💬</span>
+      <span>对话</span>
+    </a>
+    <a href="page7-memory.html">
+      <span class="tab-icon">🧠</span>
+      <span>记忆</span>
+    </a>
+    <a href="page6-me.html" class="active">
+      <span class="tab-icon">👤</span>
+      <span>我</span>
+    </a>
+  </div>
+
+  <div class="home-bar"><div class="bar"></div></div>
+</div>
+</body>
+</html>

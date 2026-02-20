@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Onboarding — Dealism</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f0f0f5;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  .phone {
+    width: 375px; height: 812px; background: #fff;
+    border-radius: 44px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), inset 0 0 0 2px #d1d1d6;
+    position: relative; display: flex; flex-direction: column;
+  }
+  .notch {
+    width: 120px; height: 34px; background: #000; border-radius: 20px;
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10;
+  }
+  .statusbar {
+    height: 54px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 28px 8px; font-size: 14px; font-weight: 600; color: #1a1a1a;
+    flex-shrink: 0;
+  }
+  .statusbar .time { font-size: 15px; font-weight: 700; }
+  .statusbar .icons { font-size: 12px; color: #666; }
+
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Message bubbles */
+  .msg {
+    max-width: 82%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .msg.agent { align-self: flex-start; }
+  .msg.user { align-self: flex-end; }
+
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .msg.agent .bubble {
+    background: #f2f2f7;
+    color: #1a1a1a;
+    border-bottom-left-radius: 6px;
+  }
+  .msg.user .bubble {
+    background: linear-gradient(135deg, #7c5bf0 0%, #5b8af0 100%);
+    color: #fff;
+    border-bottom-right-radius: 6px;
+  }
+
+  .sender {
+    font-size: 12px;
+    color: #999;
+    padding: 0 4px;
+  }
+  .msg.agent .sender { text-align: left; }
+  .msg.user .sender { text-align: right; }
+
+  /* Special: OAuth button in bubble */
+  .oauth-bubble {
+    padding: 16px;
+    border-radius: 18px;
+    background: #f2f2f7;
+    border-bottom-left-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .oauth-bubble p {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #1a1a1a;
+  }
+  .oauth-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1.5px solid #e0e0e0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .oauth-btn:active { background: #f5f5f5; }
+  .oauth-btn .g-icon {
+    width: 20px; height: 20px;
+    background: conic-gradient(from 0deg, #4285f4 0deg 90deg, #34a853 90deg 180deg, #fbbc05 180deg 270deg, #ea4335 270deg 360deg);
+    border-radius: 50%;
+  }
+
+  /* Scanning animation bubble */
+  .scan-bubble {
+    padding: 16px;
+    border-radius: 18px;
+    background: #f2f2f7;
+    border-bottom-left-radius: 6px;
+  }
+  .scan-bubble p {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+  }
+  .scan-progress {
+    height: 4px;
+    background: #e5e5ea;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .scan-progress .fill {
+    height: 100%;
+    width: 65%;
+    background: linear-gradient(90deg, #7c5bf0, #5b8af0);
+    border-radius: 2px;
+    animation: scan 2s ease-in-out infinite;
+  }
+  @keyframes scan {
+    0% { width: 20%; }
+    50% { width: 80%; }
+    100% { width: 65%; }
+  }
+  .scan-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .scan-item {
+    font-size: 13px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .scan-item .check { color: #34c759; }
+  .scan-item.pending { color: #bbb; }
+
+  /* Memory bubble */
+  .memory-bubble {
+    padding: 16px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #f5f0ff 0%, #eef4ff 100%);
+    border: 1px solid rgba(124, 91, 240, 0.15);
+    border-bottom-left-radius: 6px;
+  }
+  .memory-bubble .mem-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7c5bf0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .memory-bubble .mem-item {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+    padding: 2px 0;
+  }
+
+  /* Scenario picker */
+  .scenario-bubble {
+    padding: 16px;
+    border-radius: 18px;
+    background: #f2f2f7;
+    border-bottom-left-radius: 6px;
+  }
+  .scenario-bubble p {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+  }
+  .scenario-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    background: #fff;
+    border: 1.5px solid #e0e0e0;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .chip.selected {
+    background: linear-gradient(135deg, #7c5bf0 0%, #5b8af0 100%);
+    color: #fff;
+    border-color: transparent;
+  }
+  .chip:active { transform: scale(0.95); }
+
+  /* Typing indicator */
+  .typing {
+    align-self: flex-start;
+    display: flex;
+    gap: 4px;
+    padding: 12px 18px;
+    background: #f2f2f7;
+    border-radius: 18px;
+    border-bottom-left-radius: 6px;
+  }
+  .typing .dot {
+    width: 8px; height: 8px;
+    background: #bbb;
+    border-radius: 50%;
+    animation: typingDot 1.4s infinite;
+  }
+  .typing .dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingDot {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-4px); }
+  }
+
+  /* Spacer for scroll */
+  .spacer { height: 8px; flex-shrink: 0; }
+
+  /* Bottom input (disabled for onboarding view) */
+  .input-bar {
+    padding: 8px 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .input-field {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 24px;
+    border: 1.5px solid #e5e5ea;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    background: #fafafa;
+    color: #333;
+  }
+  .input-field::placeholder { color: #bbb; }
+  .voice-btn {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c5bf0 0%, #5b8af0 100%);
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .home-bar {
+    height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .home-bar .bar { width: 134px; height: 5px; background: #1a1a1a; border-radius: 3px; }
+
+  .back-link {
+    position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: #fff;
+    text-decoration: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; z-index: 100;
+  }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link">← All Pages</a>
+<div class="phone">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span class="time">9:41</span>
+    <div class="icons">📶 WiFi 🔋</div>
+  </div>
+
+  <div class="chat-area">
+    <!-- Agent introduces itself -->
+    <div class="msg agent">
+      <span class="sender">✨ Agent</span>
+      <div class="bubble">嗨！我是你的私人助手 👋<br><br>我的工作很简单：替你处理日常琐事，让你专注在重要的事情上。</div>
+    </div>
+
+    <div class="msg agent">
+      <div class="bubble">首先，让我连接你的邮箱，这样我就能了解你的日常，开始帮你做事。</div>
+    </div>
+
+    <!-- OAuth in bubble -->
+    <div class="msg agent">
+      <div class="oauth-bubble">
+        <p>点击下方连接你的 Gmail：</p>
+        <button class="oauth-btn">
+          <div class="g-icon"></div>
+          连接 Google 账号
+        </button>
+      </div>
+    </div>
+
+    <!-- User connected -->
+    <div class="msg user">
+      <div class="bubble">已连接 ✅</div>
+    </div>
+
+    <!-- Agent scanning -->
+    <div class="msg agent">
+      <div class="scan-bubble">
+        <p>好的，让我看看…</p>
+        <div class="scan-progress"><div class="fill"></div></div>
+        <div class="scan-items">
+          <div class="scan-item"><span class="check">✓</span> 发现你经常和 Sarah Chen 沟通</div>
+          <div class="scan-item"><span class="check">✓</span> 你似乎在等 David 的回复</div>
+          <div class="scan-item"><span class="check">✓</span> 有个快递 3 天前发出了</div>
+          <div class="scan-item pending">⋯ 继续扫描中…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent builds memory -->
+    <div class="msg agent">
+      <div class="memory-bubble">
+        <div class="mem-label">🧠 我建立的记忆</div>
+        <div class="mem-item">• 你在做 SaaS 产品相关的工作</div>
+        <div class="mem-item">• 经常需要协调团队和客户沟通</div>
+        <div class="mem-item">• Sarah Chen 是你的主要合作伙伴</div>
+        <div class="mem-item">• 你习惯在上午处理重要邮件</div>
+      </div>
+    </div>
+
+    <div class="msg agent">
+      <div class="bubble">以上对吗？你可以补充或修改，我会记住的 😊</div>
+    </div>
+
+    <div class="msg user">
+      <div class="bubble">差不多！Sarah 是我的合伙人</div>
+    </div>
+
+    <div class="msg agent">
+      <div class="bubble">明白了，已更新 ✏️<br><br>接下来，你最希望我帮你做哪些事？</div>
+    </div>
+
+    <!-- Scenario picker -->
+    <div class="msg agent">
+      <div class="scenario-bubble">
+        <p>选择你感兴趣的场景：</p>
+        <div class="scenario-chips">
+          <span class="chip selected">📧 帮我回复邮件</span>
+          <span class="chip selected">📦 追踪快递包裹</span>
+          <span class="chip">📅 约会议/安排日程</span>
+          <span class="chip selected">🔔 重要事项提醒</span>
+          <span class="chip">💰 账单到期提醒</span>
+          <span class="chip">📋 跟进待办事项</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg user">
+      <div class="bubble">选好了</div>
+    </div>
+
+    <div class="msg agent">
+      <div class="bubble">好的，我已经开始工作了 🚀<br><br>你随时可以在这里找我。有进展我会通知你。</div>
+    </div>
+
+    <!-- Typing indicator (simulating agent starting to work) -->
+    <div class="typing">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+
+  <div class="input-bar">
+    <input class="input-field" type="text" placeholder="说点什么…" />
+    <button class="voice-btn">🎙</button>
+  </div>
+
+  <div class="home-bar"><div class="bar"></div></div>
+</div>
+</body>
+</html>

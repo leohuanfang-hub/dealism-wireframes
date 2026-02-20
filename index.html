@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dealism Consumer — Wireframes V2.1</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f8f8fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 20px;
+  }
+  .logo {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #7c5bf0, #5b8af0);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 16px rgba(124,91,240,0.25);
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 15px;
+    color: #999;
+    margin-bottom: 40px;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    width: 100%;
+    max-width: 640px;
+    text-align: left;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 16px;
+    max-width: 640px;
+    width: 100%;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  .card .num {
+    font-size: 11px;
+    font-weight: 600;
+    color: #bbb;
+    letter-spacing: 0.5px;
+  }
+  .card .emoji { font-size: 28px; }
+  .card .name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  .card .desc {
+    font-size: 13px;
+    color: #999;
+    line-height: 1.4;
+  }
+
+  .card.hero {
+    background: linear-gradient(135deg, #7c5bf0 0%, #5b8af0 100%);
+    color: #fff;
+    border-color: transparent;
+  }
+  .card.hero .num,
+  .card.hero .desc { color: rgba(255,255,255,0.7); }
+  .card.hero .name { color: #fff; }
+
+  footer {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #ccc;
+  }
+</style>
+</head>
+<body>
+  <div class="logo">✨</div>
+  <h1>Dealism</h1>
+  <p class="subtitle">你的私人助手 · Wireframes V2.1</p>
+
+  <span class="section-label">Onboarding</span>
+  <div class="grid">
+    <a href="page1-welcome.html" class="card">
+      <span class="num">Page 1</span>
+      <span class="emoji">🚀</span>
+      <span class="name">Welcome</span>
+      <span class="desc">极简欢迎页，一个按钮"开始"</span>
+    </a>
+    <a href="page2-onboarding-chat.html" class="card">
+      <span class="num">Page 2</span>
+      <span class="emoji">🤝</span>
+      <span class="name">Onboarding 对话</span>
+      <span class="desc">对话式引导 + 连接 Gmail + 建立记忆</span>
+    </a>
+  </div>
+
+  <span class="section-label">核心页面（4 Tab）</span>
+  <div class="grid">
+    <a href="page4-taskflow.html" class="card hero">
+      <span class="num">Page 4 ⭐ 默认首页</span>
+      <span class="emoji">📋</span>
+      <span class="name">任务流</span>
+      <span class="desc">Agent 工作的实时 feed，待确认置顶</span>
+    </a>
+    <a href="page3-chat.html" class="card">
+      <span class="num">Page 3</span>
+      <span class="emoji">💬</span>
+      <span class="name">对话</span>
+      <span class="desc">和 Agent 沟通的主界面</span>
+    </a>
+    <a href="page7-memory.html" class="card">
+      <span class="num">Page 7 🆕</span>
+      <span class="emoji">🧠</span>
+      <span class="name">记忆</span>
+      <span class="desc">Agent 对你的了解，温暖的学习笔记</span>
+    </a>
+    <a href="page6-me.html" class="card">
+      <span class="num">Page 6</span>
+      <span class="emoji">👤</span>
+      <span class="name">我</span>
+      <span class="desc">设置与账号管理</span>
+    </a>
+  </div>
+
+  <span class="section-label">子页面</span>
+  <div class="grid">
+    <a href="page5-task-detail.html" class="card">
+      <span class="num">Page 5</span>
+      <span class="emoji">📄</span>
+      <span class="name">任务详情</span>
+      <span class="desc">进度条 + 状态总结 + 邮件卡片 + 对话输入</span>
+    </a>
+  </div>
+
+  <footer>Dealism Consumer Wireframes V2.1 · Feb 2026</footer>
+</body>
+</html>

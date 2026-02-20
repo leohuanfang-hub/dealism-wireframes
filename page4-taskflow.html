@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>任务流 — Dealism</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f0f0f5;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  .phone {
+    width: 375px; height: 812px; background: #fff;
+    border-radius: 44px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), inset 0 0 0 2px #d1d1d6;
+    position: relative; display: flex; flex-direction: column;
+  }
+  .notch {
+    width: 120px; height: 34px; background: #000; border-radius: 20px;
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10;
+  }
+  .statusbar {
+    height: 54px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 28px 8px; font-size: 14px; font-weight: 600; color: #1a1a1a;
+    flex-shrink: 0;
+  }
+  .statusbar .time { font-size: 15px; font-weight: 700; }
+  .statusbar .icons { font-size: 12px; color: #666; }
+
+  /* Header */
+  .header {
+    padding: 8px 20px 16px;
+    flex-shrink: 0;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: -0.5px;
+  }
+  .header .stats {
+    font-size: 14px;
+    color: #999;
+    margin-top: 6px;
+  }
+  .header .stats strong {
+    font-weight: 600;
+  }
+  .header .stats .confirm-count { color: #ff3b30; }
+  .header .stats .progress-count { color: #7c5bf0; }
+  .header .stats .done-count { color: #34c759; }
+
+  /* Task list */
+  .task-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 16px;
+  }
+
+  /* Section label */
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 4px 8px;
+  }
+
+  .task-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 4px;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.1s;
+  }
+  .task-card:last-child { border-bottom: none; }
+  .task-card:active { background: #fafafa; }
+
+  /* Type avatar — small circle */
+  .type-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .type-avatar.email { background: #dbeafe; }
+  .type-avatar.calendar { background: #d1fae5; }
+  .type-avatar.finance { background: #ffedd5; }
+  .type-avatar.logistics { background: #f5e6d3; }
+  .type-avatar.reminder { background: #fee2e2; }
+
+  .task-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .task-subject {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.35;
+    margin-bottom: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .task-status-desc {
+    font-size: 13px;
+    color: #999;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .task-right {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .task-time {
+    font-size: 12px;
+    color: #bbb;
+  }
+  .badge-confirm {
+    font-size: 11px;
+    font-weight: 600;
+    color: #ff3b30;
+    background: #fee2e2;
+    padding: 2px 8px;
+    border-radius: 8px;
+  }
+  .red-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #ff3b30;
+  }
+
+  /* Tab bar — 4 tabs */
+  .tab-bar {
+    display: flex; height: 52px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
+  }
+  .tab-bar a {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-decoration: none; gap: 2px;
+    font-size: 10px; color: #999; font-weight: 500;
+  }
+  .tab-bar a.active { color: #7c5bf0; }
+  .tab-bar a .tab-icon { font-size: 22px; }
+
+  .home-bar {
+    height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .home-bar .bar { width: 134px; height: 5px; background: #1a1a1a; border-radius: 3px; }
+
+  .back-link {
+    position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: #fff;
+    text-decoration: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; z-index: 100;
+  }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link">← All Pages</a>
+<div class="phone">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span class="time">10:24</span>
+    <div class="icons">📶 WiFi 🔋</div>
+  </div>
+
+  <div class="header">
+    <h1>任务流</h1>
+    <div class="stats">
+      <strong class="confirm-count">3 待确认</strong> · <strong class="progress-count">5 进行中</strong> · <strong class="done-count">28 已完成</strong>
+    </div>
+  </div>
+
+  <div class="task-list">
+    <!-- Needs confirmation — always on top -->
+    <div class="section-label">需要你确认</div>
+
+    <a href="page5-task-detail.html" class="task-card">
+      <div class="type-avatar email">📧</div>
+      <div class="task-body">
+        <div class="task-subject">回复 David 定价讨论</div>
+        <div class="task-status-desc">David 确认了周四下午，需要你确认会议地点</div>
+      </div>
+      <div class="task-right">
+        <span class="task-time">5 分钟前</span>
+        <span class="badge-confirm">待确认</span>
+      </div>
+    </a>
+
+    <a href="page5-task-detail.html" class="task-card">
+      <div class="type-avatar calendar">📅</div>
+      <div class="task-body">
+        <div class="task-subject">团队 offsite 日期投票</div>
+        <div class="task-status-desc">3 个时间选项需要你选择</div>
+      </div>
+      <div class="task-right">
+        <span class="task-time">20 分钟前</span>
+        <span class="badge-confirm">待确认</span>
+      </div>
+    </a>
+
+    <a href="page5-task-detail.html" class="task-card">
+      <div class="type-avatar finance">💰</div>
+      <div class="task-body">
+        <div class="task-subject">报销单审批</div>
+        <div class="task-status-desc">Lisa 提交了 ¥3,200 差旅报销</div>
+      </div>
+      <div class="task-right">
+        <span class="task-time">1 小时前</span>
+        <span class="badge-confirm">待确认</span>
+      </div>
+    </a>
+
+    <!-- Time-sorted stream -->
+    <div class="section-label">最新进展</div>
+
+    <a href="page5-task-detail.html" class="task-card">
+      <div class="type-avatar calendar">📅</div>
+      <div class="task-body">
+        <div class="task-subject">约 Sara 下周三见面</div>
+        <div class="task-status-desc">已发邮件等待回复</div>
+      </div>
+      <div class="task-right">
+        <span class="task-time">2 分钟前</span>
+      </div>
+    </a>
+
+    <a href="page5-task-detail.html" class="task-card">
+      <div class="type-avatar logistics">📦</div>
+      <div class="task-body">
+        <div class="task-subject">顺丰快递追踪</div>
+        <div class="task-status-desc">快递正在运送中，预计明天送达</div>
+      </div>
+      <div class="task-right">
+        <span class="task-time">15 分钟前</span>
+      </div>
+    </a>
+
+    <a href="page5-task-detail.html" class="task-card">
+      <div class="type-avatar email">📧</div>
+      <div class="task-body">
+        <div class="task-subject">回复 Lisa 项目进度询问</div>
+        <div class="task-status-desc">已按你的意思回复，对方已读</div>
+      </div>
+      <div class="task-right">
+        <span class="task-time">1 小时前</span>
+      </div>
+    </a>
+
+    <a href="page5-task-detail.html" class="task-card">
+      <div class="type-avatar reminder">🔔</div>
+      <div class="task-body">
+        <div class="task-subject">电费账单提醒</div>
+        <div class="task-status-desc">2 月电费 ¥287，已提醒你</div>
+      </div>
+      <div class="task-right">
+        <span class="task-time">3 小时前</span>
+      </div>
+    </a>
+
+    <a href="page5-task-detail.html" class="task-card">
+      <div class="type-avatar calendar">📅</div>
+      <div class="task-body">
+        <div class="task-subject">团队周会提醒</div>
+        <div class="task-status-desc">已在会前 30 分钟提醒你</div>
+      </div>
+      <div class="task-right">
+        <span class="task-time">昨天</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="tab-bar">
+    <a href="page4-taskflow.html" class="active">
+      <span class="tab-icon">📋</span>
+      <span>任务流</span>
+    </a>
+    <a href="page3-chat.html">
+      <span class="tab-icon">💬</span>
+      <span>对话</span>
+    </a>
+    <a href="page7-memory.html">
+      <span class="tab-icon">🧠</span>
+      <span>记忆</span>
+    </a>
+    <a href="page6-me.html">
+      <span class="tab-icon">👤</span>
+      <span>我</span>
+    </a>
+  </div>
+
+  <div class="home-bar"><div class="bar"></div></div>
+</div>
+</body>
+</html>

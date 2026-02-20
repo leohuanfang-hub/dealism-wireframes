@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>任务详情 — Dealism</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f0f0f5;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  .phone {
+    width: 375px; height: 812px; background: #fff;
+    border-radius: 44px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), inset 0 0 0 2px #d1d1d6;
+    position: relative; display: flex; flex-direction: column;
+  }
+  .notch {
+    width: 120px; height: 34px; background: #000; border-radius: 20px;
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10;
+  }
+  .statusbar {
+    height: 54px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 28px 8px; font-size: 14px; font-weight: 600; color: #1a1a1a;
+    flex-shrink: 0;
+  }
+  .statusbar .time { font-size: 15px; font-weight: 700; }
+  .statusbar .icons { font-size: 12px; color: #666; }
+
+  /* Nav header */
+  .nav-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 20px 16px;
+    flex-shrink: 0;
+  }
+  .nav-back {
+    font-size: 22px;
+    color: #7c5bf0;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+  .nav-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #d1fae5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .nav-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* Content */
+  .detail-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 20px;
+  }
+
+  /* Progress — single percentage bar */
+  .progress-section {
+    margin-bottom: 20px;
+  }
+  .progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .progress-pct {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #7c5bf0, #5b8af0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .progress-label {
+    font-size: 13px;
+    color: #999;
+  }
+  .progress-bar {
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 60%;
+    background: linear-gradient(90deg, #7c5bf0, #5b8af0);
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+
+  /* Status summary */
+  .status-section {
+    margin-bottom: 20px;
+  }
+  .status-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .status-summary {
+    background: linear-gradient(135deg, rgba(124,91,240,0.05), rgba(91,138,240,0.05));
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .status-summary p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 6px;
+  }
+  .status-summary p:last-child { margin-bottom: 0; }
+
+  /* Communication log */
+  .comm-section {
+    margin-bottom: 20px;
+  }
+  .comm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    cursor: pointer;
+  }
+  .comm-header h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  .comm-toggle {
+    font-size: 14px;
+    color: #999;
+    transition: transform 0.2s;
+  }
+  .comm-toggle.open { transform: rotate(180deg); }
+
+  .comm-log {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* Email card style */
+  .email-card {
+    background: #f8f8fa;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #ececf0;
+  }
+  .email-card-header {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid #ececf0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+  }
+  .email-field {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.5;
+  }
+  .email-field strong {
+    color: #666;
+    font-weight: 600;
+  }
+  .email-card-body {
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+  }
+  .view-original {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 12px;
+    color: #7c5bf0;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* Pending step */
+  .pending-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #fafafa;
+    border-radius: 14px;
+    border: 1px dashed #e0e0e0;
+  }
+  .pending-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #e5e5ea;
+    flex-shrink: 0;
+  }
+  .pending-text {
+    font-size: 14px;
+    color: #bbb;
+    line-height: 1.5;
+  }
+
+  /* Bottom input area (replaces feedback buttons) */
+  .bottom-input-area {
+    flex-shrink: 0;
+    border-top: 1px solid #f0f0f0;
+    padding: 10px 16px 0;
+  }
+  .quick-suggestions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .quick-tag {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    color: #666;
+    background: #f2f2f7;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .quick-tag:active { background: #e8e8ed; }
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .input-field {
+    flex: 1; padding: 12px 16px; border-radius: 24px;
+    border: 1.5px solid #e5e5ea; font-size: 15px;
+    font-family: inherit; outline: none; background: #fafafa; color: #333;
+  }
+  .input-field::placeholder { color: #bbb; }
+  .mic-btn {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c5bf0 0%, #5b8af0 100%);
+    border: none; color: #fff; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sync-note {
+    font-size: 11px;
+    color: #bbb;
+    text-align: center;
+    padding: 4px 0 0;
+  }
+
+  /* Tab bar — 4 tabs */
+  .tab-bar {
+    display: flex; height: 52px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
+  }
+  .tab-bar a {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-decoration: none; gap: 2px;
+    font-size: 10px; color: #999; font-weight: 500;
+  }
+  .tab-bar a.active { color: #7c5bf0; }
+  .tab-bar a .tab-icon { font-size: 22px; }
+
+  .home-bar {
+    height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .home-bar .bar { width: 134px; height: 5px; background: #1a1a1a; border-radius: 3px; }
+
+  .back-link {
+    position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: #fff;
+    text-decoration: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; z-index: 100;
+  }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link">← All Pages</a>
+<div class="phone">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span class="time">10:25</span>
+    <div class="icons">📶 WiFi 🔋</div>
+  </div>
+
+  <div class="nav-header">
+    <a href="page4-taskflow.html" class="nav-back">‹</a>
+    <div class="nav-avatar">📅</div>
+    <span class="nav-title">约 Sara 下周三见面</span>
+  </div>
+
+  <div class="detail-content">
+    <!-- Progress: single percentage bar -->
+    <div class="progress-section">
+      <div class="progress-top">
+        <span class="progress-pct">60%</span>
+        <span class="progress-label">进行中 · 等待回复</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width: 60%;"></div></div>
+    </div>
+
+    <!-- Status summary -->
+    <div class="status-section">
+      <div class="status-title">当前状态</div>
+      <div class="status-summary">
+        <p>已发邮件给 Sara Chen 询问下周三下午是否有空见面。</p>
+        <p>邮件已发送 2 分钟，尚未收到回复。收到回复后我会立即通知你。</p>
+      </div>
+    </div>
+
+    <!-- Communication log — embedded email cards -->
+    <div class="comm-section">
+      <div class="comm-header" onclick="this.querySelector('.comm-toggle').classList.toggle('open'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'flex' : 'none';">
+        <h3>沟通过程</h3>
+        <span class="comm-toggle open">▾</span>
+      </div>
+      <div class="comm-log">
+        <!-- Sent email card -->
+        <div class="email-card">
+          <div class="email-card-header">
+            <div class="email-field"><strong>From:</strong> Leo &lt;leo@example.com&gt;</div>
+            <div class="email-field"><strong>To:</strong> Sara Chen &lt;sara@example.com&gt;</div>
+            <div class="email-field"><strong>Subject:</strong> 下周三下午见面？</div>
+            <a href="#" class="view-original">查看原文 ›</a>
+          </div>
+          <div class="email-card-body">
+            Hi Sara，我想约下周三下午见面聊一下最近的项目进展，你方便吗？时间你来定就好。
+          </div>
+        </div>
+
+        <!-- Pending reply -->
+        <div class="pending-step">
+          <div class="pending-dot"></div>
+          <div class="pending-text">等待 Sara 回复中…</div>
+        </div>
+
+        <!-- Future step -->
+        <div class="pending-step">
+          <div class="pending-dot"></div>
+          <div class="pending-text">收到回复后，确认时间并通知你</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom input area -->
+  <div class="bottom-input-area">
+    <div class="quick-suggestions">
+      <button class="quick-tag">继续跟进</button>
+      <button class="quick-tag">我来处理</button>
+      <button class="quick-tag">取消任务</button>
+    </div>
+    <div class="input-row">
+      <input class="input-field" type="text" placeholder="对这个任务说点什么…" />
+      <button class="mic-btn">🎙</button>
+    </div>
+    <div class="sync-note">回复会同步到对话</div>
+  </div>
+
+  <div class="tab-bar">
+    <a href="page4-taskflow.html">
+      <span class="tab-icon">📋</span>
+      <span>任务流</span>
+    </a>
+    <a href="page3-chat.html">
+      <span class="tab-icon">💬</span>
+      <span>对话</span>
+    </a>
+    <a href="page7-memory.html">
+      <span class="tab-icon">🧠</span>
+      <span>记忆</span>
+    </a>
+    <a href="page6-me.html">
+      <span class="tab-icon">👤</span>
+      <span>我</span>
+    </a>
+  </div>
+
+  <div class="home-bar"><div class="bar"></div></div>
+</div>
+</body>
+</html>

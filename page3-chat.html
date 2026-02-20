@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>对话 — Dealism</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f0f0f5;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  .phone {
+    width: 375px; height: 812px; background: #fff;
+    border-radius: 44px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), inset 0 0 0 2px #d1d1d6;
+    position: relative; display: flex; flex-direction: column;
+  }
+  .notch {
+    width: 120px; height: 34px; background: #000; border-radius: 20px;
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 10;
+  }
+  .statusbar {
+    height: 54px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 28px 8px; font-size: 14px; font-weight: 600; color: #1a1a1a;
+    flex-shrink: 0;
+  }
+  .statusbar .time { font-size: 15px; font-weight: 700; }
+  .statusbar .icons { font-size: 12px; color: #666; }
+
+  /* Status strip */
+  .status-strip {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(124,91,240,0.06) 0%, rgba(91,138,240,0.06) 100%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    background: #34c759;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .status-text {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+  }
+
+  /* Chat area */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .time-divider {
+    text-align: center;
+    font-size: 12px;
+    color: #bbb;
+    padding: 8px 0 4px;
+  }
+
+  .msg { max-width: 82%; display: flex; flex-direction: column; gap: 5px; }
+  .msg.agent { align-self: flex-start; }
+  .msg.user { align-self: flex-end; }
+  .sender { font-size: 12px; color: #999; padding: 0 4px; }
+
+  .bubble {
+    padding: 13px 16px; border-radius: 18px;
+    font-size: 15px; line-height: 1.55; word-break: break-word;
+  }
+  .msg.agent .bubble {
+    background: #f2f2f7; color: #1a1a1a; border-bottom-left-radius: 6px;
+  }
+  .msg.user .bubble {
+    background: linear-gradient(135deg, #7c5bf0 0%, #5b8af0 100%);
+    color: #fff; border-bottom-right-radius: 6px;
+  }
+
+  /* Discovery card in chat */
+  .discovery-card {
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: #f2f2f7;
+    border-bottom-left-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .discovery-card .disc-header {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .discovery-card .disc-icon {
+    width: 32px; height: 32px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    background: #fff;
+  }
+  .discovery-card .disc-text {
+    font-size: 15px; line-height: 1.5; color: #1a1a1a;
+  }
+  .discovery-card .disc-actions {
+    display: flex; gap: 8px;
+  }
+  .disc-action-btn {
+    flex: 1; padding: 10px;
+    border-radius: 12px; border: none;
+    font-size: 14px; font-weight: 500;
+    font-family: inherit; cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .disc-action-btn:active { transform: scale(0.96); }
+  .disc-action-btn.primary {
+    background: linear-gradient(135deg, #7c5bf0, #5b8af0);
+    color: #fff;
+  }
+  .disc-action-btn.secondary {
+    background: #fff; color: #666;
+    border: 1px solid #e5e5ea;
+  }
+
+  /* Email reply suggestion */
+  .reply-card {
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: #f2f2f7;
+    border-bottom-left-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .reply-card .rc-from {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: #666;
+  }
+  .reply-card .rc-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff9a56, #ff6b6b);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #fff; font-weight: 600;
+  }
+  .reply-card .rc-context {
+    font-size: 15px; line-height: 1.5; color: #1a1a1a;
+  }
+  .reply-card .rc-suggestion {
+    padding: 12px;
+    background: #fff;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #444;
+    border-left: 3px solid #7c5bf0;
+  }
+  .reply-card .rc-actions {
+    display: flex; gap: 8px;
+  }
+
+  /* Bottom input */
+  .input-area {
+    flex-shrink: 0;
+    border-top: 1px solid #f0f0f0;
+  }
+  .input-bar {
+    padding: 8px 16px 0;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .input-field {
+    flex: 1; padding: 12px 16px; border-radius: 24px;
+    border: 1.5px solid #e5e5ea; font-size: 15px;
+    font-family: inherit; outline: none; background: #fafafa; color: #333;
+  }
+  .input-field::placeholder { color: #bbb; }
+  .mic-btn {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c5bf0 0%, #5b8af0 100%);
+    border: none; color: #fff; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  /* Tab bar — 4 tabs */
+  .tab-bar {
+    display: flex; height: 52px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
+  }
+  .tab-bar a {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-decoration: none; gap: 2px;
+    font-size: 10px; color: #999; font-weight: 500;
+  }
+  .tab-bar a.active { color: #7c5bf0; }
+  .tab-bar a .tab-icon { font-size: 22px; }
+
+  .home-bar {
+    height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .home-bar .bar { width: 134px; height: 5px; background: #1a1a1a; border-radius: 3px; }
+
+  .back-link {
+    position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: #fff;
+    text-decoration: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; z-index: 100;
+  }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link">← All Pages</a>
+<div class="phone">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span class="time">10:23</span>
+    <div class="icons">📶 WiFi 🔋</div>
+  </div>
+
+  <div class="status-strip">
+    <div class="status-dot"></div>
+    <span class="status-text">正在处理 3 个任务</span>
+  </div>
+
+  <div class="chat-area">
+    <div class="time-divider">今天 10:15</div>
+
+    <!-- Agent discovery: package -->
+    <div class="msg agent">
+      <span class="sender">✨ Agent</span>
+      <div class="discovery-card">
+        <div class="disc-header">
+          <div class="disc-icon">📦</div>
+          <div class="disc-text">我发现你有个快递明天到，顺丰 SF1234567890。</div>
+        </div>
+        <div class="disc-actions">
+          <button class="disc-action-btn primary">帮我追踪</button>
+          <button class="disc-action-btn secondary">忽略</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg user">
+      <div class="bubble">帮我追踪 👍</div>
+    </div>
+
+    <div class="msg agent">
+      <div class="bubble">好的，已加入任务流。到了我会通知你 📦</div>
+    </div>
+
+    <div class="time-divider">10:20</div>
+
+    <!-- Agent: email needs reply -->
+    <div class="msg agent">
+      <div class="reply-card">
+        <div class="rc-from">
+          <div class="rc-avatar">D</div>
+          <span>David Wang 回复了你的邮件</span>
+        </div>
+        <div class="rc-context">"合作方案我看了，整体 OK，想聊聊定价部分…"</div>
+        <div class="rc-suggestion">建议回复：<br>"好的 David，定价部分我们可以灵活调整。你看周四下午方便聊一下吗？"</div>
+        <div class="rc-actions">
+          <button class="disc-action-btn primary">发送</button>
+          <button class="disc-action-btn secondary">修改</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg user">
+      <div class="bubble">发送吧，谢谢</div>
+    </div>
+
+    <div class="msg agent">
+      <div class="bubble">已发送 ✅ 我会跟进 David 的回复。</div>
+    </div>
+
+    <div class="time-divider">10:22</div>
+
+    <!-- User proactive command -->
+    <div class="msg user">
+      <div class="bubble">帮我约 Sarah 下周三见面，下午都行</div>
+    </div>
+
+    <div class="msg agent">
+      <div class="bubble">好的，我来联系 Sarah 确认她下周三下午的时间。安排好了告诉你。</div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-bar">
+      <input class="input-field" type="text" placeholder="说点什么…" />
+      <button class="mic-btn">🎙</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <a href="page4-taskflow.html">
+      <span class="tab-icon">📋</span>
+      <span>任务流</span>
+    </a>
+    <a href="page3-chat.html" class="active">
+      <span class="tab-icon">💬</span>
+      <span>对话</span>
+    </a>
+    <a href="page7-memory.html">
+      <span class="tab-icon">🧠</span>
+      <span>记忆</span>
+    </a>
+    <a href="page6-me.html">
+      <span class="tab-icon">👤</span>
+      <span>我</span>
+    </a>
+  </div>
+
+  <div class="home-bar"><div class="bar"></div></div>
+</div>
+</body>
+</html>
